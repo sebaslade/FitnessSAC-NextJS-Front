@@ -31,7 +31,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log("Login exitoso:", data)
+        //console.log("Login exitoso:", data)
 
         // Aquí podrías guardar la sesión, por ejemplo en localStorage
         localStorage.setItem("userId", data.id_cliente)

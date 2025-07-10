@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { DialogDescription } from "@radix-ui/react-dialog"
 import type { Reserva } from "@/types/reserva"
 
-
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
@@ -45,7 +44,7 @@ export default function ProfilePage() {
     const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem("userId")
-        console.log("userId obtenido:", userId)
+        //console.log("userId obtenido:", userId)
 
         if (!userId) {
           router.push("/clientes/login")
@@ -84,7 +83,7 @@ export default function ProfilePage() {
         if (!res.ok) throw new Error("Error al obtener reservas")
 
         const data = await res.json()
-        console.log("Reservas obtenidas:", data)
+        //console.log("Reservas obtenidas:", data)
 
         const ahora = new Date()
         const upcoming = data.filter((r: any) => {
@@ -184,6 +183,10 @@ export default function ProfilePage() {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("userId")
+    router.push("/clientes/login")
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4">
@@ -194,7 +197,7 @@ export default function ProfilePage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Mi Perfil</h1>
           <p className="text-gray-600">Gestiona tu información y configuraciones</p>
 
-          <div className="mb-4">
+          <div className="mb-4 flex justify-between items-center">
             <Button
               variant="outline"
               onClick={() => router.push("/entrenamientos")}
@@ -202,7 +205,16 @@ export default function ProfilePage() {
             >
               <ArrowLeft className="h-4 w-4 text-orange-600" /> Volver a entrenamientos
             </Button>
+            
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white cursor-pointer"
+            >
+              <Lock className="h-4 w-4" /> Cerrar sesión
+            </Button>
           </div>
+
         </div>
 
         {/* Profile Header Card */}

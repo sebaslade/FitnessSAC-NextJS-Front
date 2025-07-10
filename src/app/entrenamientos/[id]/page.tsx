@@ -9,8 +9,17 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import type { Entrenamiento } from "@/types/entrenamiento"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 export default function EntrenamientoDetallePage() {
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
   const { id } = useParams()
   const router = useRouter()
   const [entrenamiento, setEntrenamiento] = useState<Entrenamiento | null>(null)
@@ -37,6 +46,38 @@ export default function EntrenamientoDetallePage() {
     entrenamiento.hora_inicio.substring(0, 5),
     entrenamiento.hora_fin.substring(0, 5),
   ]
+
+  const handleReservar = async () => {
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      setShowLoginDialog(true)
+      return
+    }
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reservas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_cliente: parseInt(userId),
+          id_entrenamiento: entrenamiento.idEntrenamiento,
+          estado: "Reservado"
+        })
+      })
+
+      if (!res.ok) {
+        const error = await res.text()
+        throw new Error(error)
+      }
+
+      setShowSuccessDialog(true)
+
+    } catch (error: any) {
+      alert("Error al realizar reserva: " + error.message)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 flex items-center justify-center p-4">
@@ -120,6 +161,42 @@ export default function EntrenamientoDetallePage() {
             </ul>
           </div>
 
+          {/* Diálogo de Éxito */}
+          <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+            <DialogContent className="text-center">
+              <DialogHeader>
+                <DialogTitle className="text-2xl text-green-600">¡Reserva exitosa!</DialogTitle>
+              </DialogHeader>
+              <p className="text-gray-600">Tu entrenamiento ha sido reservado correctamente.</p>
+              <DialogFooter className="mt-4">
+                <Button
+                  className="w-full bg-orange-600 hover:bg-orange-700 cursor-pointer"
+                  onClick={() => router.push("/clientes/perfil")}
+                >
+                  Ir a mi perfil
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Diálogo si no hay login */}
+          <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+            <DialogContent className="text-center">
+              <DialogHeader>
+                <DialogTitle className="text-xl text-red-600">Inicia sesión</DialogTitle>
+              </DialogHeader>
+              <p className="text-gray-600">Debes iniciar sesión para reservar un entrenamiento.</p>
+              <DialogFooter className="mt-4">
+                <Button
+                  className="w-full bg-orange-600 hover:bg-orange-700"
+                  onClick={() => router.push("/clientes/login")}
+                >
+                  Ir a iniciar sesión
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <Separator />
 
           <div className="text-center">
@@ -128,7 +205,10 @@ export default function EntrenamientoDetallePage() {
             </div>
             <p className="text-gray-600 mb-6">Por sesión individual</p>
 
-            <Button className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-6 cursor-pointer" size="lg">
+            <Button 
+              className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-6 cursor-pointer" 
+              size="lg"
+              onClick={handleReservar}>
               Reservar Entrenamiento
             </Button>
           </div>

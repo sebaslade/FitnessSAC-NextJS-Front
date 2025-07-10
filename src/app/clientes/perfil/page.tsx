@@ -28,6 +28,9 @@ export default function ProfilePage() {
   const [dialogTitle, setDialogTitle] = useState("")
   const [dialogMessage, setDialogMessage] = useState("")
   const [dialogSuccess, setDialogSuccess] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
 
   const [userData, setUserData] = useState({
     name: "",
@@ -101,6 +104,47 @@ export default function ProfilePage() {
       setDialogMessage(error.message || "Hubo un problema al actualizar tu información.")
       setDialogSuccess(false)
     }finally {
+      setShowDialog(true)
+    }
+  }
+
+  const handleChangePassword = async () => {
+    try {
+      const userId = localStorage.getItem("userId")
+      if (!userId) throw new Error("ID de usuario no encontrado")
+
+      if (newPassword !== confirmPassword) {
+        throw new Error("Las nuevas contraseñas no coinciden")
+      }
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clientes/${userId}/cambiarPassword`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          passwordActual: currentPassword,
+          nuevaPassword: newPassword
+        }),
+      })
+
+      const responseText = await res.text()
+
+      if (!res.ok) throw new Error(responseText)
+
+      setDialogTitle("Contraseña actualizada")
+      setDialogMessage("Tu contraseña fue cambiada correctamente.")
+      setDialogSuccess(true)
+      setShowDialog(true)
+      
+      // Limpia campos
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+    } catch (error: any) {
+      setDialogTitle("Error al cambiar contraseña")
+      setDialogMessage(error.message)
+      setDialogSuccess(false)
       setShowDialog(true)
     }
   }
@@ -288,11 +332,13 @@ export default function ProfilePage() {
                     type={showCurrentPassword ? "text" : "password"}
                     placeholder="Tu contraseña actual"
                     className="pl-10 pr-10"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -308,11 +354,13 @@ export default function ProfilePage() {
                     type={showNewPassword ? "text" : "password"}
                     placeholder="Tu nueva contraseña"
                     className="pl-10 pr-10"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -328,18 +376,22 @@ export default function ProfilePage() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirma tu nueva contraseña"
                     className="pl-10 pr-10"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+              <Button 
+                onClick={handleChangePassword}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 cursor-pointer">
                 Cambiar Contraseña
               </Button>
             </CardContent>

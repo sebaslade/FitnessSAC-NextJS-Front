@@ -139,7 +139,7 @@ export default function Entrenamientos() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={"/placeholder.svg"} alt={training.trainer.nombre} />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
                         {training.trainer.nombre
                           .split(" ")
                           .map((n) => n[0])

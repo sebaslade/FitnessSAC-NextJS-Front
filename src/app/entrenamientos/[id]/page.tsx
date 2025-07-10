@@ -54,7 +54,7 @@ export default function EntrenamientoDetallePage() {
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
               <AvatarImage src="/placeholder.svg" alt="Entrenador" />
-              <AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
                 {entrenamiento.trainer.nombre
                   .split(" ")
                   .map((n) => n[0])

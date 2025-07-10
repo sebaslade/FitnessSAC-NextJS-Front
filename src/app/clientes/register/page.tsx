@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react"
+import { Eye, EyeOff, User, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -59,7 +59,7 @@ export default function RegisterPage() {
         setError(errorText || "Error al registrar")
       }
     } catch (err) {
-      setError("Error de red o del servidor")
+      console.error("Error de conexión:", err)
     } finally {
       setLoading(false)
     }

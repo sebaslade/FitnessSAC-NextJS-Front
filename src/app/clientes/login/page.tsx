@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +43,6 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Error de conexión:", err)
-      setError("No se pudo conectar con el servidor")
     } finally {
       setLoading(false)
     }

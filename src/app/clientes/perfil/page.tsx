@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { User, Mail, Phone, Lock, Camera, Save, Edit3, Calendar, Trophy, Settings, Eye, EyeOff, ArrowLeft, CheckCircle, XCircle } from "lucide-react"
+import { User, Mail, Phone, Lock, Save, Edit3, Calendar, Eye, EyeOff, ArrowLeft, CheckCircle, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -70,7 +70,7 @@ export default function ProfilePage() {
     }
 
     fetchUserData()
-  }, [])
+  }, [router])
 
   useEffect(() => {
     const fetchReservas = async () => {
@@ -86,12 +86,12 @@ export default function ProfilePage() {
         //console.log("Reservas obtenidas:", data)
 
         const ahora = new Date()
-        const upcoming = data.filter((r: any) => {
+        const upcoming = data.filter((r: Reserva) => {
           const fechaReserva = new Date(r.fecha_reserva)
           return fechaReserva >= ahora
         })
 
-        const history = data.filter((r: any) => {
+        const history = data.filter((r: Reserva) => {
           const fechaReserva = new Date(r.fecha_reserva)
           return fechaReserva < ahora
         })
@@ -104,7 +104,7 @@ export default function ProfilePage() {
     }
 
     fetchReservas()
-  }, [])
+  }, [router])
 
 
   const handleSaveChanges = async () => {
@@ -133,10 +133,15 @@ export default function ProfilePage() {
       setDialogMessage("Tu información se actualizó correctamente.")
       setDialogSuccess(true)
       setIsEditing(false)
-    } catch (error:any) {
-      setDialogTitle("Error al guardar")
-      setDialogMessage(error.message || "Hubo un problema al actualizar tu información.")
+    } catch (error:unknown) {
+      if (error instanceof Error) {
+        setDialogTitle("Error al cambiar contraseña")
+        setDialogMessage(error.message)
+      } else {
+        setDialogMessage("Ocurrió un error inesperado")
+      }
       setDialogSuccess(false)
+      setShowDialog(true)
     }finally {
       setShowDialog(true)
     }
@@ -175,9 +180,13 @@ export default function ProfilePage() {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-    } catch (error: any) {
-      setDialogTitle("Error al cambiar contraseña")
-      setDialogMessage(error.message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setDialogTitle("Error al cambiar contraseña")
+        setDialogMessage(error.message)
+      } else {
+        setDialogMessage("Ocurrió un error inesperado")
+      }
       setDialogSuccess(false)
       setShowDialog(true)
     }
@@ -225,7 +234,7 @@ export default function ProfilePage() {
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={"/placeholder.svg"} alt="Perfil" />
                   <AvatarFallback className="text-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                    {userData.name[0]}
+                    {userData.name ? userData.name[0] : ""}
                   </AvatarFallback>
                 </Avatar>
               </div>
@@ -457,7 +466,7 @@ export default function ProfilePage() {
                   {/* Próximos entrenamientos */}
                   <h3 className="text-lg font-semibold text-gray-800">Próximos Entrenamientos</h3>
                   {upcomingTrainings.length > 0 ? (
-                    upcomingTrainings.map((training, index) => (
+                    upcomingTrainings.map((training: Reserva, index) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg mb-2">
                         <div>
                           <p className="font-semibold">
@@ -485,7 +494,7 @@ export default function ProfilePage() {
                   {trainingHistory.length > 0 && (
                     <>
                       <h3 className="text-lg font-semibold text-gray-800 mt-8">Historial de Entrenamientos</h3>
-                      {trainingHistory.map((training, index) => (
+                      {trainingHistory.map((training: Reserva, index) => (
                         <div key={index} className="flex items-center justify-between p-4 bg-gray-100 rounded-lg mb-2">
                           <div>
                             <p className="font-semibold">

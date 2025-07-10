@@ -7,8 +7,6 @@ import {
   MapPin,
   ChevronRight,
   Dumbbell,
-  Heart,
-  Zap,
   User,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"

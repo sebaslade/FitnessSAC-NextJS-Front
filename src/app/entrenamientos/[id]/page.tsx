@@ -74,8 +74,12 @@ export default function EntrenamientoDetallePage() {
 
       setShowSuccessDialog(true)
 
-    } catch (error: any) {
-      alert("Error al realizar reserva: " + error.message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert("Error al realizar reserva: " + error.message)
+      } else {
+        alert("Error al realizar reserva: error desconocido")
+      }
     }
   }
 

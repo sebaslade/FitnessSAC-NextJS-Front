@@ -108,12 +108,6 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-center text-sm">
-              <a href="#" className="text-orange-600 hover:text-orange-700 font-medium">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
-
             <Button
               type="submit"
               disabled={loading}
@@ -129,6 +123,14 @@ export default function LoginPage() {
               Regístrate aquí
             </a>
           </div>
+          <Button
+            type="button"
+            onClick={() => window.location.href = "/entrenamientos"}
+            variant="outline"
+            className="w-full mt-2 border-gray-300 text-gray-700 hover:text-orange-600 hover:border-orange-600 cursor-pointer"
+          >
+            Ver Entrenamientos sin Iniciar Sesión
+          </Button>
         </CardContent>
       </Card>
     </div>

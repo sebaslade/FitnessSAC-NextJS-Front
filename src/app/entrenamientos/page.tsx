@@ -30,15 +30,15 @@ export default function Entrenamientos() {
 
     useEffect(() => {
         const fetchTrainings = async () => {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/entrenamientos`)
-            const data = await res.json()
-            setTrainings(data)
-        } catch (error) {
-            console.error("Error al obtener entrenamientos:", error)
-        } finally {
-            setLoading(false)
-        }
+          try {
+              const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/entrenamientos`)
+              const data = await res.json()
+              setTrainings(data)
+          } catch (error) {
+              console.error("Error al obtener entrenamientos:", error)
+          } finally {
+              setLoading(false)
+          }
         }
 
         fetchTrainings()

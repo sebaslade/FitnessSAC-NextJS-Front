@@ -23,14 +23,10 @@ export default function RegisterPage() {
           <CardDescription>Únete a la comunidad FitZone</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">Nombre</Label>
               <Input id="firstName" placeholder="Tu nombre" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Apellido</Label>
-              <Input id="lastName" placeholder="Tu apellido" />
             </div>
           </div>
 
@@ -39,11 +35,13 @@ export default function RegisterPage() {
             <Input id="email" type="email" placeholder="tu@email.com" />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono</Label>
-            <Input id="phone" type="tel" placeholder="+56 9 1234 5678" />
+            <div className="space-y-2">
+                <Label htmlFor="phone">Teléfono</Label>
+                <div className="relative">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input id="phone" type="tel" placeholder="999 999 999" className="pl-10" />
+                </div>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="password">Contraseña</Label>
             <div className="relative">
@@ -82,30 +80,9 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="flex items-start space-x-2 text-sm">
-            <input type="checkbox" className="rounded border-gray-300 mt-1" />
-            <span className="text-gray-600">
-              Acepto los{" "}
-              <a href="#" className="text-orange-600 hover:text-orange-700 font-medium">términos</a> y{" "}
-              <a href="#" className="text-orange-600 hover:text-orange-700 font-medium">política de privacidad</a>
-            </span>
-          </div>
-
-          <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-6 text-lg">
+          <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-6 text-lg cursor-pointer">
             Crear Cuenta
           </Button>
-
-          <div className="relative">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
-              o regístrate con
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="py-6 bg-transparent">Google</Button>
-            <Button variant="outline" className="py-6 bg-transparent">Facebook</Button>
-          </div>
 
           <div className="text-center text-sm text-gray-600">
             ¿Ya tienes cuenta?{" "}

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 
-export default function TrainingBooking() {
+export default function EntreamientoDetalle() {
   const [isBooked, setIsBooked] = useState(false)
 
   const handleBooking = () => {
@@ -29,13 +29,7 @@ export default function TrainingBooking() {
               <CardDescription className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 María Rodríguez - Entrenadora Certificada
-              </CardDescription>
-              <div className="flex items-center gap-1 mt-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="text-sm text-gray-600 ml-1">(4.9)</span>
-              </div>
+              </CardDescription>    
             </div>
           </div>
         </CardHeader>

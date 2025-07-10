@@ -19,7 +19,7 @@ export default function LoginPage() {
             <User className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">Iniciar Sesión</CardTitle>
-          <CardDescription>Accede a tu cuenta de FitZone</CardDescription>
+          <CardDescription>Accede a tu cuenta de FitnessSAC</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -50,31 +50,15 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" className="rounded border-gray-300" />
-              <span className="text-gray-600">Recordarme</span>
-            </label>
+          <div className="flex items-center justify-center text-sm">
             <a href="#" className="text-orange-600 hover:text-orange-700 font-medium">
               ¿Olvidaste tu contraseña?
             </a>
           </div>
 
-          <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-6 text-lg">
+          <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-6 text-lg cursor-pointer">
             Iniciar Sesión
           </Button>
-
-          <div className="relative">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
-              o continúa con
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="py-6 bg-transparent">Google</Button>
-            <Button variant="outline" className="py-6 bg-transparent">Facebook</Button>
-          </div>
 
           <div className="text-center text-sm text-gray-600">
             ¿No tienes cuenta?{" "}

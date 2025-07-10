@@ -34,7 +34,7 @@ export default function LoginPage() {
         console.log("Login exitoso:", data)
 
         // Aquí podrías guardar la sesión, por ejemplo en localStorage
-        // localStorage.setItem("cliente", JSON.stringify(data))
+        localStorage.setItem("userId", data.id_cliente)
 
         // Redirige al dashboard o a otra página
         window.location.href = "/entrenamientos"

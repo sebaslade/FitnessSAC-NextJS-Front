@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { User, Mail, Phone, Lock, Camera, Save, Edit3, Calendar, Trophy, Settings, Eye, EyeOff } from "lucide-react"
+import { User, Mail, Phone, Lock, Camera, Save, Edit3, Calendar, Trophy, Settings, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,6 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
@@ -21,39 +24,65 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("personal")
 
   const [userData, setUserData] = useState({
-    firstName: "María",
-    lastName: "González",
-    email: "maria.gonzalez@email.com",
-    phone: "+56 9 8765 4321",
-    birthDate: "1990-05-15",
-    gender: "female",
-    goals: "Mejorar mi condición física general y ganar fuerza muscular",
-    experience: "intermediate",
+    name: "",
+    email: "",
+    phone: "",
   })
 
-  const handleSave = () => {
-    setIsEditing(false)
-    // Aquí iría la lógica para guardar los datos
-  }
+  const router = useRouter()
 
-  const upcomingTrainings = [
-    { date: "2024-01-15", time: "10:00", trainer: "María Rodríguez", type: "Personal" },
-    { date: "2024-01-17", time: "15:00", trainer: "Carlos López", type: "Grupal" },
-  ]
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem("userId")
+        console.log("userId obtenido:", userId)
 
-  const trainingHistory = [
-    { date: "2024-01-10", trainer: "María Rodríguez", type: "Personal", status: "Completado" },
-    { date: "2024-01-08", trainer: "Ana Silva", type: "Yoga", status: "Completado" },
-    { date: "2024-01-05", trainer: "Carlos López", type: "Grupal", status: "Completado" },
-  ]
+        if (!userId) {
+          router.push("/clientes/login")
+          return
+        }
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clientes/${userId}`)
+
+        if (!res.ok) {
+          throw new Error("No se pudo obtener la información del usuario.")
+        }
+
+        const data = await res.json()
+
+        setUserData({
+          name: data.nombre?.split(" ")[0] || "",
+          email: data.email || "",
+          phone: data.telefono || "",
+        })
+      } catch (error) {
+        console.error("Error al obtener usuario:", error)
+        router.push("/clientes/login")
+      }
+    }
+
+    fetchUserData()
+  }, [])
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
+          <br />
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Mi Perfil</h1>
           <p className="text-gray-600">Gestiona tu información y configuraciones</p>
+
+          <div className="mb-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/entrenamientos")}
+              className="flex items-center gap-2 hover:text-orange-600 cursor-pointer bg-white shadow hover:shadow-md transition"
+            >
+              <ArrowLeft className="h-4 w-4 text-orange-600" /> Volver a entrenamientos
+            </Button>
+          </div>
         </div>
 
         {/* Profile Header Card */}
@@ -62,15 +91,15 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src="/placeholder.svg?height=96&width=96" alt="Perfil" />
+                  <AvatarImage src={"/placeholder.svg"} alt="Perfil" />
                   <AvatarFallback className="text-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                    {userData.firstName[0]}
+                    {userData.name[0]}
                   </AvatarFallback>
                 </Avatar>
               </div>
               <div className="text-center md:text-left flex-1">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {userData.firstName} {userData.lastName}
+                  {userData.name}
                 </h2>
                 <p className="text-gray-600 mb-2">
                 <Badge className="bg-orange-100 text-orange-700">{userData.email}</Badge></p>
@@ -91,7 +120,7 @@ export default function ProfilePage() {
           <Button
             variant={activeTab === "personal" ? "default" : "outline"}
             onClick={() => setActiveTab("personal")}
-            className={activeTab === "personal" ? "bg-gradient-to-r from-orange-500 to-red-500" : ""}
+            className={activeTab === "personal" ? "bg-gradient-to-r from-orange-500 to-red-500" : "cursor-pointer"}
           >
             <User className="h-4 w-4 mr-2" />
             Información Personal
@@ -99,7 +128,7 @@ export default function ProfilePage() {
           <Button
             variant={activeTab === "security" ? "default" : "outline"}
             onClick={() => setActiveTab("security")}
-            className={activeTab === "security" ? "bg-gradient-to-r from-orange-500 to-red-500" : ""}
+            className={activeTab === "security" ? "bg-gradient-to-r from-orange-500 to-red-500" : "cursor-pointer"}
           >
             <Lock className="h-4 w-4 mr-2" />
             Seguridad
@@ -107,10 +136,10 @@ export default function ProfilePage() {
           <Button
             variant={activeTab === "trainings" ? "default" : "outline"}
             onClick={() => setActiveTab("trainings")}
-            className={activeTab === "trainings" ? "bg-gradient-to-r from-orange-500 to-red-500" : ""}
+            className={activeTab === "trainings" ? "bg-gradient-to-r from-orange-500 to-red-500" : "cursor-pointer"}
           >
             <Calendar className="h-4 w-4 mr-2" />
-            Mis Entrenamientos
+            Mis Reservas
           </Button>
         </div>
 
@@ -129,8 +158,8 @@ export default function ProfilePage() {
                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="firstName"
-                      value={userData.firstName}
-                      onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
+                      value={userData.name}
+                      onChange={(e) => setUserData({ ...userData, name: e.target.value })}
                       disabled={!isEditing}
                       className="pl-10"
                     />
@@ -247,7 +276,7 @@ export default function ProfilePage() {
         )}
 
         {/* Trainings Tab */}
-        {activeTab === "trainings" && (
+        {/* {activeTab === "trainings" && (
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -301,7 +330,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   )

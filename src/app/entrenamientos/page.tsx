@@ -70,9 +70,19 @@ export default function Entrenamientos() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
+          <br />
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Entrenamientos Disponibles</h1>
           <p className="text-gray-600">Encuentra el entrenamiento perfecto para ti</p>
+          <br />
+          <button
+            onClick={() => router.push("/clientes/perfil")}
+            className="p-2 rounded-full bg-white shadow hover:shadow-md transition cursor-pointer text-orange-600"
+            aria-label="Ver perfil"
+          >
+            <User className="h-6 w-20 text-orange-600 flex" /> Perfil
+          </button>
         </div>
+
 
         {/* Filters */}
         <Card className="mb-8">

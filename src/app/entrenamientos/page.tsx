@@ -17,50 +17,53 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Entrenamiento } from "@/types/entrenamiento"
+import { useRouter } from "next/navigation"
 
-export default function TrainingList() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedLevel, setSelectedLevel] = useState("all")
-  const [loading, setLoading] = useState(true)
-  const [trainings, setTrainings] = useState<Entrenamiento[]>([])
+export default function Entrenamientos() {
+    const [searchTerm, setSearchTerm] = useState("")
+    const [selectedCategory, setSelectedCategory] = useState("all")
+    const [selectedLevel, setSelectedLevel] = useState("all")
+    const [loading, setLoading] = useState(true)
+    const [trainings, setTrainings] = useState<Entrenamiento[]>([])
 
-  useEffect(() => {
-    const fetchTrainings = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/entrenamientos`)
-        const data = await res.json()
-        setTrainings(data)
-      } catch (error) {
-        console.error("Error al obtener entrenamientos:", error)
-      } finally {
-        setLoading(false)
-      }
+    const router = useRouter()
+
+    useEffect(() => {
+        const fetchTrainings = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/entrenamientos`)
+            const data = await res.json()
+            setTrainings(data)
+        } catch (error) {
+            console.error("Error al obtener entrenamientos:", error)
+        } finally {
+            setLoading(false)
+        }
+        }
+
+        fetchTrainings()
+    }, [])
+
+    const filteredTrainings = trainings.filter((training) => {
+        const matchesSearch =
+        training.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        training.trainer.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+
+        const matchesCategory =
+        selectedCategory === "all" || training.modalidad.tipo === selectedCategory
+
+        const matchesLevel = selectedLevel === "all"
+
+        return matchesSearch && matchesCategory && matchesLevel
+    })
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat("es-PE", {
+        style: "currency",
+        currency: "PEN",
+        minimumFractionDigits: 2,
+        }).format(price)
     }
-
-    fetchTrainings()
-  }, [])
-
-  const filteredTrainings = trainings.filter((training) => {
-    const matchesSearch =
-      training.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      training.trainer.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesCategory =
-      selectedCategory === "all" || training.modalidad.tipo === selectedCategory
-
-    const matchesLevel = selectedLevel === "all"
-
-    return matchesSearch && matchesCategory && matchesLevel
-  })
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-PE", {
-      style: "currency",
-      currency: "PEN",
-      minimumFractionDigits: 2,
-    }).format(price)
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4">
@@ -102,7 +105,11 @@ export default function TrainingList() {
             ]
 
             return (
-              <Card key={training.idEntrenamiento} className="hover:shadow-lg transition-shadow duration-300 cursor-pointer group">
+                <Card 
+                    className="hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
+                    key={training.idEntrenamiento} 
+                    onClick={() => router.push(`/entrenamientos/${training.idEntrenamiento}`)}
+                >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className={`p-2 rounded-lg bg-orange-100 text-orange-700 mb-3`}>
@@ -166,8 +173,9 @@ export default function TrainingList() {
                       <span className="text-sm text-gray-500 ml-1">por sesión</span>
                     </div>
                     <Button
-                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 group-hover:shadow-md transition-all"
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 group-hover:shadow-md transition-all cursor-pointer"
                       size="sm"
+                      onClick={() => router.push(`/entrenamientos/${training.idEntrenamiento}`)}
                     >
                       Ver detalles
                       <ChevronRight className="h-4 w-4 ml-1" />

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { User, Mail, Phone, Lock, Camera, Save, Edit3, Calendar, Trophy, Settings, Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { User, Mail, Phone, Lock, Camera, Save, Edit3, Calendar, Trophy, Settings, Eye, EyeOff, ArrowLeft, CheckCircle, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,8 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogDescription } from "@radix-ui/react-dialog"
 
 
 export default function ProfilePage() {
@@ -22,6 +24,10 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [activeTab, setActiveTab] = useState("personal")
+  const [showDialog, setShowDialog] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState("")
+  const [dialogMessage, setDialogMessage] = useState("")
+  const [dialogSuccess, setDialogSuccess] = useState(false)
 
   const [userData, setUserData] = useState({
     name: "",
@@ -63,6 +69,41 @@ export default function ProfilePage() {
 
     fetchUserData()
   }, [])
+
+  const handleSaveChanges = async () => {
+    try {
+      const userId = localStorage.getItem("userId")
+      if (!userId) throw new Error("ID de usuario no encontrado.")
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clientes/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nombre: userData.name,
+          email: userData.email,
+          telefono: userData.phone
+        })
+      })
+
+      if (!res.ok) {
+        const errorText = await res.text()
+        throw new Error(errorText)
+      }
+
+      setDialogTitle("Cambios guardados")
+      setDialogMessage("Tu información se actualizó correctamente.")
+      setDialogSuccess(true)
+      setIsEditing(false)
+    } catch (error:any) {
+      setDialogTitle("Error al guardar")
+      setDialogMessage(error.message || "Hubo un problema al actualizar tu información.")
+      setDialogSuccess(false)
+    }finally {
+      setShowDialog(true)
+    }
+  }
 
 
   return (
@@ -106,7 +147,7 @@ export default function ProfilePage() {
               </div>
               <Button
                 onClick={() => setIsEditing(!isEditing)}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 cursor-pointer text-white flex items-center gap-2"
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 {isEditing ? "Cancelar" : "Editar Perfil"}
@@ -196,9 +237,39 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
+              {isEditing && (
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleSaveChanges}
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 cursor-pointer"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Guardar Cambios
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {dialogSuccess ? (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-600" />
+                )}
+                <span className={dialogSuccess ? "text-orange-500" : "text-red-600"}>
+                  {dialogTitle}
+                </span>
+              </DialogTitle>
+              <DialogDescription className="text-gray-700">
+                {dialogMessage}
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
 
         {/* Security Tab */}
         {activeTab === "security" && (

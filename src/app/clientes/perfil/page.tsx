@@ -6,16 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DialogDescription } from "@radix-ui/react-dialog"
+import type { Reserva } from "@/types/reserva"
 
 
 export default function ProfilePage() {
@@ -32,11 +29,15 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
+  const [upcomingTrainings, setUpcomingTrainings] = useState<Reserva[]>([])
+  const [trainingHistory, setTrainingHistory] = useState<Reserva[]>([])
+
   const [userData, setUserData] = useState({
     name: "",
     email: "",
     phone: "",
   })
+
 
   const router = useRouter()
 
@@ -50,7 +51,6 @@ export default function ProfilePage() {
           router.push("/clientes/login")
           return
         }
-
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clientes/${userId}`)
 
         if (!res.ok) {
@@ -72,6 +72,41 @@ export default function ProfilePage() {
 
     fetchUserData()
   }, [])
+
+  useEffect(() => {
+    const fetchReservas = async () => {
+      try {
+        const userId = localStorage.getItem("userId")
+        if (!userId) return
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/clientes/${userId}/reservas`)
+        
+        if (!res.ok) throw new Error("Error al obtener reservas")
+
+        const data = await res.json()
+        console.log("Reservas obtenidas:", data)
+
+        const ahora = new Date()
+        const upcoming = data.filter((r: any) => {
+          const fechaReserva = new Date(r.fecha_reserva)
+          return fechaReserva >= ahora
+        })
+
+        const history = data.filter((r: any) => {
+          const fechaReserva = new Date(r.fecha_reserva)
+          return fechaReserva < ahora
+        })
+
+        setUpcomingTrainings(upcoming)
+        setTrainingHistory(history)
+      } catch (err) {
+        console.error("Error cargando reservas:", err)
+      }
+    }
+
+    fetchReservas()
+  }, [])
+
 
   const handleSaveChanges = async () => {
     try {
@@ -399,61 +434,69 @@ export default function ProfilePage() {
         )}
 
         {/* Trainings Tab */}
-        {/* {activeTab === "trainings" && (
-          <div className="space-y-6">
+        {activeTab === "trainings" && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Próximos Entrenamientos
-                </CardTitle>
+                <CardTitle>Mis Reservas</CardTitle>
+                <CardDescription>Consulta tus reservas de entrenamientos</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  {upcomingTrainings.map((training, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold">
-                          {training.type} con {training.trainer}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {training.date} a las {training.time}
-                        </p>
+                  {/* Próximos entrenamientos */}
+                  <h3 className="text-lg font-semibold text-gray-800">Próximos Entrenamientos</h3>
+                  {upcomingTrainings.length > 0 ? (
+                    upcomingTrainings.map((training, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg mb-2">
+                        <div>
+                          <p className="font-semibold">
+                            {training.entrenamiento.tipo}
+                          </p>
+                          <p>
+                            Entrenador: {training.entrenamiento.trainer.nombre}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {new Date(`${training.fecha_reserva}T${training.entrenamiento.hora_inicio}`).toLocaleDateString()} a las{" "}
+                            {new Date(`${training.fecha_reserva}T${training.entrenamiento.hora_inicio}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Ubicación: {training.entrenamiento.modalidad.ubicacion}
+                          </p>
+                        </div>
+                        <Badge className="bg-orange-100 text-orange-700">{training.estado}</Badge>
                       </div>
-                      <Badge className="bg-orange-100 text-orange-700">Confirmado</Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No tienes próximos entrenamientos.</p>
+                  )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5" />
-                  Historial de Entrenamientos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {trainingHistory.map((training, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <p className="font-semibold">
-                          {training.type} con {training.trainer}
-                        </p>
-                        <p className="text-sm text-gray-600">{training.date}</p>
-                      </div>
-                      <Badge variant="outline" className="text-green-600 border-green-600">
-                        {training.status}
-                      </Badge>
-                    </div>
-                  ))}
+                  {/* Historial de entrenamientos */}
+                  {trainingHistory.length > 0 && (
+                    <>
+                      <h3 className="text-lg font-semibold text-gray-800 mt-8">Historial de Entrenamientos</h3>
+                      {trainingHistory.map((training, index) => (
+                        <div key={index} className="flex items-center justify-between p-4 bg-gray-100 rounded-lg mb-2">
+                          <div>
+                            <p className="font-semibold">
+                              {training.entrenamiento.tipo} 
+                            </p>
+                            <p>Entrenador: {training.entrenamiento.trainer.nombre}</p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(`${training.fecha_reserva}T${training.entrenamiento.hora_inicio}`).toLocaleDateString()} a las{" "}
+                              {new Date(`${training.fecha_reserva}T${training.entrenamiento.hora_inicio}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Ubicación: {training.entrenamiento.modalidad.ubicacion}
+                            </p>
+                          </div>
+                          <Badge className="bg-gray-300 text-gray-800">{training.estado}</Badge>
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          </div>
-        )} */}
+          )}
       </div>
     </div>
   )
